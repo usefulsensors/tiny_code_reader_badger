@@ -4,6 +4,7 @@
 
 import struct
 import time
+import qrcode
 
 from pimoroni_i2c import PimoroniI2C
 
@@ -15,11 +16,14 @@ import badger2040
 WIDTH = badger2040.WIDTH
 HEIGHT = badger2040.HEIGHT
 
-IMAGE_WIDTH = 128
+QRCODE_FRAME_SIZE = 128
+QRCODE_ORIGIN_X = WIDTH - QRCODE_FRAME_SIZE
+QRCODE_ORIGIN_Y = 0
 
+START_TEXT = "Press A to scan and display a QR code"
 TEXT_TOP_PADDING = 8
 TEXT_HEIGHT = HEIGHT - 2
-TEXT_WIDTH = WIDTH - IMAGE_WIDTH - 1
+TEXT_WIDTH = WIDTH - QRCODE_FRAME_SIZE
 LINE_HEIGHT = 18
 FONT_SIZE = 0.7
 
@@ -62,16 +66,30 @@ def word_wrap(input_text, font_size, box_width):
     
     return output_lines
 
+def measure_qr_code(size, code):
+    w, h = code.get_size()
+    module_size = int(size / w)
+    return w, module_size
+
+
+def draw_qr_code(text, ox, oy, frame_size):
+    code = qrcode.QRCode()
+    code.set_text(text)
+    modules_across, module_size = measure_qr_code(frame_size, code)
+    display.set_pen(15)
+    display.rectangle(ox, oy, frame_size, frame_size)
+    display.set_pen(0)
+    for x in range(modules_across):
+        for y in range(modules_across):
+            if code.get_module(x, y):
+                display.rectangle(ox + x * module_size, oy + y * module_size, module_size, module_size)
+
+
 def draw_badge(text):
     display.set_pen(0)
     display.clear()
 
-    # Draw a border around the image
-    display.set_pen(0)
-    display.line(WIDTH - IMAGE_WIDTH, 0, WIDTH - 1, 0)
-    display.line(WIDTH - IMAGE_WIDTH, 0, WIDTH - IMAGE_WIDTH, HEIGHT - 1)
-    display.line(WIDTH - IMAGE_WIDTH, HEIGHT - 1, WIDTH - 1, HEIGHT - 1)
-    display.line(WIDTH - 1, 0, WIDTH - 1, HEIGHT - 1)
+    draw_qr_code(text, QRCODE_ORIGIN_X, QRCODE_ORIGIN_Y, QRCODE_FRAME_SIZE)
 
     display.set_pen(15)
     display.rectangle(0, 0, TEXT_WIDTH, HEIGHT)
@@ -99,10 +117,7 @@ display.led(128)
 display.set_update_speed(badger2040.UPDATE_NORMAL)
 display.set_thickness(2)
 
-TEST_TEXT = """Hello World, this is Pete Warden
-I am testing the word wrap capabilities with averyveryveryverylonglonglongword.
-"""
-draw_badge(TEST_TEXT)
+draw_badge(START_TEXT)
 
 while True:
     # Sometimes a button press or hold will keep the system
