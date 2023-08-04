@@ -1,8 +1,7 @@
 # MicroPython example of reading the Tiny Code Reader from Useful Sensors on a
-# Micro:bit. See https://usfl.ink/ps_dev for full documentation on the module,
+# Badger 2040. See https://usfl.ink/ps_dev for full documentation on the module,
 # and README.md in this project for details on wiring and assembly.
 
-import struct
 import time
 import qrcode
 
@@ -11,6 +10,7 @@ from pimoroni_i2c import PimoroniI2C
 from read_qr_code import read_qr_code
 
 import badger2040
+import badger_os
 
 # Global Constants
 WIDTH = badger2040.WIDTH
@@ -20,7 +20,7 @@ QRCODE_FRAME_SIZE = 128
 QRCODE_ORIGIN_X = WIDTH - QRCODE_FRAME_SIZE
 QRCODE_ORIGIN_Y = 0
 
-START_TEXT = "Press A to scan and display a QR code"
+DEFAULT_TEXT = "Press A to scan and display a QR code"
 TEXT_TOP_PADDING = 8
 TEXT_HEIGHT = HEIGHT - 2
 TEXT_WIDTH = WIDTH - QRCODE_FRAME_SIZE
@@ -106,6 +106,13 @@ def draw_badge(text):
 
     display.update()
 
+def message(text):
+    display.set_pen(15)
+    display.clear()
+    display.set_pen(0)
+    display.text(text, 0, TEXT_TOP_PADDING, TEXT_WIDTH, FONT_SIZE)
+    display.update()
+
 
 # ------------------------------
 #        Program setup
@@ -117,7 +124,12 @@ display.led(128)
 display.set_update_speed(badger2040.UPDATE_NORMAL)
 display.set_thickness(2)
 
-draw_badge(START_TEXT)
+state = {
+    "display_text": DEFAULT_TEXT,
+}
+badger_os.state_load("qr_scanner", state)
+
+draw_badge(state["display_text"])
 
 while True:
     # Sometimes a button press or hold will keep the system
@@ -125,11 +137,15 @@ while True:
     display.keepalive()
 
     if display.pressed(badger2040.BUTTON_A):
-        display.clear()
-        qr_code_text = read_qr_code(10.0)
+        message("Point at a QR code")
+        qr_code_text = read_qr_code(30.0)
         if qr_code_text:
-            display_text = qr_code_text
-            draw_badge(display_text)
+            state["display_text"] = qr_code_text
+            badger_os.state_save("qr_scanner", state)
+            draw_badge(state["display_text"])
+        else:
+            message("No QR code found")
+            time.sleep(10.0)
 
     # If on battery, halt the Badger to save power, it will wake up if any of the front buttons are pressed
     display.halt()
