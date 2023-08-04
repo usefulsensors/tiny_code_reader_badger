@@ -1,5 +1,5 @@
 # MicroPython example of reading the Tiny Code Reader from Useful Sensors on a
-# Micro:bit. See https://usfl.ink/ps_dev for full documentation on the module,
+# Pimoroni board See https://usfl.ink/ps_dev for full documentation on the module,
 # and README.md in this project for details on wiring and assembly.
 
 import struct
