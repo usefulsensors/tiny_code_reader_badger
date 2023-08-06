@@ -24,7 +24,7 @@ explore.
 
 You'll need the following items to run this code:
 
- - [Badger 2040]((https://shop.pimoroni.com/products/badger-2040?variant=39752959885395) (Badger 2040W should also work, but hasn't been tested)
+ - [Badger 2040](https://shop.pimoroni.com/products/badger-2040?variant=39752959885395) (Badger 2040W should also work, but hasn't been tested)
  - [Tiny Code Reader](https://usfl.ink/ps).
  - QWIIC to QWIIC cable.
  - USB C cable.
@@ -99,3 +99,9 @@ how to use it in more detail:
 
 [![Badger TCR Demo](https://i.ytimg.com/vi/QbQPJNfke8Y/maxresdefault.jpg)](https://www.youtube.com/watch?v=QbQPJNfke8Y "Badger TCR Demo")
 
+## Going Further
+
+If you are using a Badger 2040 W, you might want to look at our [Pico W code for setting up Wifi credentials](https://github.com/usefulsensors/tiny_code_reader_wifi_micropython). 
+I'm betting there are a lot of uses we've never even thought of, so please
+[do get in touch](mailto:contact@usefulsensors.com) to let us know what you've
+built!
