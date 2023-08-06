@@ -27,7 +27,24 @@ TEXT_WIDTH = WIDTH - QRCODE_FRAME_SIZE
 LINE_HEIGHT = 18
 FONT_SIZE = 0.7
 
-NAME_PADDING = 20
+MESSAGE_ORIGIN_Y = 64
+
+BUTTON_WIDTH = 57
+BUTTON_HEIGHT = 17
+BUTTON_ORIGIN_Y = 101
+BUTTON_TEXT_ORIGIN_Y = 110
+BUTTON_FONT_SIZE = 0.5
+BUTTON_TRI_TOP_Y = BUTTON_ORIGIN_Y + BUTTON_HEIGHT - 1
+BUTTON_TRI_BOTTOM_Y = HEIGHT
+BUTTON_TRI_WIDTH = 10
+
+BUTTON_A_ORIGIN_X = 13
+BUTTON_A_TEXT_ORIGIN_X = 22
+BUTTON_A_TEXT = "SCAN"
+BUTTON_A_TRI_MID_X = (BUTTON_A_ORIGIN_X + (BUTTON_WIDTH // 2))
+BUTTON_A_TRI_LEFT_X =  BUTTON_A_TRI_MID_X - (BUTTON_TRI_WIDTH // 2)
+BUTTON_A_TRI_RIGHT_X = BUTTON_A_TRI_MID_X + (BUTTON_TRI_WIDTH // 2)
+
 
 def is_too_long(text, font_size, box_width):
     new_width = display.measure_text(text, font_size)
@@ -84,6 +101,24 @@ def draw_qr_code(text, ox, oy, frame_size):
             if code.get_module(x, y):
                 display.rectangle(ox + x * module_size, oy + y * module_size, module_size, module_size)
 
+def draw_buttons():
+
+    display.set_pen(0)
+    display.rectangle(BUTTON_A_ORIGIN_X, BUTTON_ORIGIN_Y, BUTTON_WIDTH, BUTTON_HEIGHT)
+
+    display.triangle(
+        BUTTON_A_TRI_LEFT_X, BUTTON_TRI_TOP_Y, 
+        BUTTON_A_TRI_RIGHT_X, BUTTON_TRI_TOP_Y, 
+        BUTTON_A_TRI_MID_X, BUTTON_TRI_BOTTOM_Y)
+
+    display.set_pen(15)
+    display.set_font("sans")
+    display.text(BUTTON_A_TEXT, BUTTON_A_TEXT_ORIGIN_X, BUTTON_TEXT_ORIGIN_Y, BUTTON_WIDTH, BUTTON_FONT_SIZE)
+
+    display.pixel(BUTTON_A_ORIGIN_X, BUTTON_ORIGIN_Y)
+    display.pixel(BUTTON_A_ORIGIN_X, BUTTON_ORIGIN_Y + BUTTON_HEIGHT - 1)
+    display.pixel(BUTTON_A_ORIGIN_X + BUTTON_WIDTH - 1, BUTTON_ORIGIN_Y)
+    display.pixel(BUTTON_A_ORIGIN_X + BUTTON_WIDTH - 1, BUTTON_ORIGIN_Y + BUTTON_HEIGHT - 1)
 
 def draw_badge(text):
     display.set_pen(0)
@@ -104,13 +139,15 @@ def draw_badge(text):
         y = TEXT_TOP_PADDING + (index * LINE_HEIGHT)
         display.text(line, x, y, TEXT_WIDTH, FONT_SIZE)
 
+    draw_buttons()
+
     display.update()
 
 def draw_message(text):
 
     message_width = display.measure_text(text, FONT_SIZE)
     ox = (WIDTH - message_width) // 2
-    oy = 64
+    oy = MESSAGE_ORIGIN_Y
 
     display.set_pen(15)
     display.clear()
