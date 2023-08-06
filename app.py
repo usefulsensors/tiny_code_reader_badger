@@ -106,11 +106,16 @@ def draw_badge(text):
 
     display.update()
 
-def message(text):
+def draw_message(text):
+
+    message_width = display.measure_text(text, FONT_SIZE)
+    ox = (WIDTH - message_width) // 2
+    oy = 64
+
     display.set_pen(15)
     display.clear()
     display.set_pen(0)
-    display.text(text, 0, TEXT_TOP_PADDING, TEXT_WIDTH, FONT_SIZE)
+    display.text(text, ox, oy, TEXT_WIDTH, FONT_SIZE)
     display.update()
 
 
@@ -137,15 +142,16 @@ while True:
     display.keepalive()
 
     if display.pressed(badger2040.BUTTON_A):
-        message("Point at a QR code")
+        draw_message("Point at a QR code")
         qr_code_text = read_qr_code(30.0)
         if qr_code_text:
             state["display_text"] = qr_code_text
             badger_os.state_save("qr_scanner", state)
             draw_badge(state["display_text"])
         else:
-            message("No QR code found")
+            draw_message("No QR code found")
             time.sleep(10.0)
+            draw_badge(state["display_text"])
 
     # If on battery, halt the Badger to save power, it will wake up if any of the front buttons are pressed
     display.halt()
